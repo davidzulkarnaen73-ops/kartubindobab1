@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kartu Pintar: Teks Eksplanasi Kelas 6</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --success: #4cc9f0;
+            --success-dark: #00b4d8;
+            --background: #f8f9fa;
+            --card-front: #ffffff;
+            --card-back: #e0f7fa;
+            --text-main: #2b2d42;
+            --text-light: #8d99ae;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1 {
+            color: var(--secondary);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background-color: #e9ecef;
+            border-radius: 20px;
+            height: 25px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--success), var(--success-dark));
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Flashcard Area */
+        .card-container {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border: 4px solid transparent;
+        }
+
+        .card-front {
+            background-color: var(--card-front);
+            border-color: var(--primary);
+        }
+
+        .card-back {
+            background-color: var(--card-back);
+            border-color: var(--success-dark);
+            transform: rotateY(180deg);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .card-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+
+        .card-back .card-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--success);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: none;
+        }
+
+        .status-badge.show {
+            display: block;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .btn-nav {
+            background-color: var(--primary);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-nav:hover { background-color: var(--secondary); }
+        .btn-nav:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .btn-understand {
+            background-color: #e9ecef;
+            color: var(--text-main);
+            width: 100%;
+            border: 2px solid var(--success);
+        }
+
+        .btn-understand.understood {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-shuffle {
+            background-color: var(--accent);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-shuffle:hover { filter: brightness(1.1); }
+
+        /* Navigation Grid */
+        .nav-grid-container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .nav-grid-title {
+            text-align: center;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            color: var(--text-light);
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 8px;
+        }
+
+        .nav-dot {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+            background: white;
+            font-weight: bold;
+            cursor: pointer;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .nav-dot:hover {
+            background-color: #f1f3f5;
+        }
+
+        .nav-dot.active {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .nav-dot.understood {
+            border-color: var(--success);
+            background-color: #e0f7fa;
+            color: var(--success-dark);
+        }
+        
+        .nav-dot.active.understood {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .click-hint {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 10px;
+        }
+
+        @media (max-width: 480px) {
+            .card-container { height: 320px; }
+            .card-text { font-size: 1.1rem; }
+            button { font-size: 0.9rem; padding: 10px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>📚 Kartu Pintar Eksplanasi</h1>
+        <div class="subtitle">Media Belajar Mandiri Kelas 6 SD</div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="progress-text" id="progressText">0 / 20 Dipahami</div>
+        </div>
+    </header>
+
+    <div class="card-container" onclick="flipCard()">
+        <div class="card" id="flashcard">
+            <!-- Front of card -->
+            <div class="card-face card-front">
+                <div class="status-badge" id="badgeFront">✅ Paham</div>
+                <div class="card-icon">❓</div>
+                <div class="card-text" id="cardFrontText">Pertanyaan memuat...</div>
+            </div>
+            <!-- Back of card -->
+            <div class="card-face card-back">
+                <div class="status-badge" id="badgeBack">✅ Paham</div>
+                <div class="card-icon">💡</div>
+                <div class="card-text" id="cardBackText">Jawaban memuat...</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="click-hint">👆 Klik kartu untuk membalik 👆</div>
+    <br>
+
+    <div class="controls">
+        <button class="btn-nav" id="btnPrev" onclick="prevCard()">⬅️ Sebelumnya</button>
+        <button class="btn-nav" id="btnNext" onclick="nextCard()">Berikutnya ➡️</button>
+        <button class="btn-understand" id="btnUnderstand" onclick="toggleUnderstand(event)">
+            <span>✓</span> Tandai Sudah Dipahami
+        </button>
+        <button class="btn-shuffle" onclick="shuffleCards()">🔀 Acak Kartu</button>
+    </div>
+
+    <div class="nav-grid-container">
+        <div class="nav-grid-title">Pilih Nomor Kartu:</div>
+        <div class="nav-grid" id="navGrid">
+            <!-- Navigation dots generated by JS -->
+        </div>
+    </div>
+
+    <script>
+        // Data Kartu Teks Eksplanasi Kelas 6
+        const originalCards = [
+            { id: 1, front: "Apa itu teks eksplanasi?", back: "Teks yang berisi penjelasan tentang proses mengapa dan bagaimana suatu peristiwa alam, sosial, ilmu pengetahuan, atau budaya terjadi.", understood: false },
+            { id: 2, front: "Apa tujuan dari penulisan teks eksplanasi?", back: "Menyajikan informasi berupa fakta secara jelas kepada pembaca tentang proses terjadinya suatu peristiwa.", understood: false },
+            { id: 3, front: "Sebutkan 3 bagian struktur utama dari teks eksplanasi!", back: "1. Pernyataan Umum (Pembuka)\n2. Deretan Penjelas (Isi)\n3. Kesimpulan / Interpretasi (Penutup)", understood: false },
+            { id: 4, front: "Apa yang dimaksud dengan 'Pernyataan Umum'?", back: "Bagian awal teks yang berisi gambaran atau informasi umum tentang topik atau peristiwa yang akan dibahas.", understood: false },
+            { id: 5, front: "Bagian teks eksplanasi yang berisi urutan sebab akibat peristiwa secara detail disebut...", back: "Deretan Penjelas (Bagian Isi teks).", understood: false },
+            { id: 6, front: "Apa isi dari bagian 'Kesimpulan' atau 'Interpretasi'?", back: "Berisi kesimpulan, pendapat, atau pandangan singkat penulis tentang topik yang telah dijelaskan.", understood: false },
+            { id: 7, front: "Apakah teks eksplanasi boleh berisi karangan fiksi atau khayalan?", back: "Tidak, teks eksplanasi harus bersifat faktual (non-fiksi) atau berdasarkan fakta yang sebenarnya.", understood: false },
+            { id: 8, front: "Apa itu kata penghubung (konjungsi) kausalitas?", back: "Kata hubung yang menunjukkan hubungan sebab-akibat antar kejadian.", understood: false },
+            { id: 9, front: "Berikan contoh kata penghubung sebab-akibat (kausalitas)!", back: "Sebab, karena, oleh sebab itu, oleh karena itu, sehingga.", understood: false },
+            { id: 10, front: "Apa yang dimaksud dengan kata penghubung kronologis?", back: "Kata hubung yang digunakan untuk menunjukkan urutan waktu terjadinya suatu peristiwa.", understood: false },
+            { id: 11, front: "Sebutkan contoh kata penghubung urutan waktu (kronologis)!", back: "Kemudian, lalu, setelah itu, pada akhirnya, sebelumnya.", understood: false },
+            { id: 12, front: "Teks eksplanasi harus menggunakan ragam bahasa yang baik. Apa itu kata baku?", back: "Kata yang cara pengucapan dan penulisannya sesuai dengan kaidah pedoman ejaan yang berlaku (PUEBI/EYD).", understood: false },
+            { id: 13, front: "\"Banjir terjadi *karena* saluran air tersumbat sampah.\" Kata *karena* termasuk konjungsi apa?", back: "Konjungsi sebab-akibat (kausalitas).", understood: false },
+            { id: 14, front: "Mengapa kita harus membaca teks secara saksama saat ingin menjawab pertanyaan?", back: "Agar kita dapat menemukan informasi penting, fakta, dan gagasan pokok secara tepat yang ada di dalam teks.", understood: false },
+            { id: 15, front: "Bagaimana cara efektif menemukan ide pokok dalam suatu paragraf?", back: "Membaca keseluruhan paragraf, lalu mencari kalimat utama yang menjadi inti pembahasan paragraf tersebut.", understood: false },
+            { id: 16, front: "Apa langkah pertama yang harus dilakukan saat ingin menulis teks eksplanasi?", back: "Menentukan tema atau topik peristiwa yang ingin dijelaskan.", understood: false },
+            { id: 17, front: "Setelah menentukan tema tulisan, apa langkah penting selanjutnya?", back: "Mengumpulkan data, fakta, atau informasi mengenai tema tersebut dari berbagai sumber yang terpercaya.", understood: false },
+            { id: 18, front: "Saat menyampaikan ide menggunakan teks eksplanasi, kalimat yang digunakan sebaiknya...", back: "Jelas, padat, mudah dipahami (efektif), dan disusun mengikuti struktur teks eksplanasi.", understood: false },
+            { id: 19, front: "\"Gempa bumi bermagnitudo 5,0 terjadi di perairan.\" Apakah kalimat ini cocok untuk teks eksplanasi?", back: "Ya, karena kalimat ini adalah sebuah pernyataan fakta yang sering muncul pada bagian Pernyataan Umum.", understood: false },
+            { id: 20, front: "Mengapa teks eksplanasi sering dikaitkan dengan istilah 'keilmuan'?", back: "Karena fenomena atau kejadian yang dijelaskannya selalu berkaitan dengan ilmu pengetahuan, seperti sains, sejarah, atau fenomena alam.", understood: false }
+        ];
+
+        let cards = JSON.parse(JSON.stringify(originalCards)); // Deep copy
+        let currentIndex = 0;
+        const totalCards = cards.length;
+
+        // Elements
+        const cardElement = document.getElementById('flashcard');
+        const cardFrontText = document.getElementById('cardFrontText');
+        const cardBackText = document.getElementById('cardBackText');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const btnUnderstand = document.getElementById('btnUnderstand');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const navGrid = document.getElementById('navGrid');
+        const badgeFront = document.getElementById('badgeFront');
+        const badgeBack = document.getElementById('badgeBack');
+
+        // Initialize
+        function init() {
+            renderNavGrid();
+            updateUI();
+        }
+
+        // Card Functions
+        function flipCard() {
+            cardElement.classList.toggle('is-flipped');
+        }
+
+        function updateUI() {
+            const card = cards[currentIndex];
+            
+            // Format text (handle newlines)
+            cardFrontText.innerHTML = card.front.replace(/\n/g, '<br>');
+            cardBackText.innerHTML = card.back.replace(/\n/g, '<br>');
+
+            // Reset flip state silently if changing cards
+            cardElement.classList.remove('is-flipped');
+
+            // Button states
+            btnPrev.disabled = currentIndex === 0;
+            btnNext.disabled = currentIndex === totalCards - 1;
+
+            // Understood state
+            if (card.understood) {
+                btnUnderstand.classList.add('understood');
+                btnUnderstand.innerHTML = "✅ Sudah Dipahami";
+                badgeFront.classList.add('show');
+                badgeBack.classList.add('show');
+            } else {
+                btnUnderstand.classList.remove('understood');
+                btnUnderstand.innerHTML = "<span>✓</span> Tandai Sudah Dipahami";
+                badgeFront.classList.remove('show');
+                badgeBack.classList.remove('show');
+            }
+
+            updateProgress();
+            updateNavGridHighlight();
+        }
+
+        function nextCard() {
+            if (currentIndex < totalCards - 1) {
+                currentIndex++;
+                updateUI();
+            }
+        }
+
+        function prevCard() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateUI();
+            }
+        }
+
+        function goToCard(index) {
+            currentIndex = index;
+            updateUI();
+        }
+
+        function toggleUnderstand(e) {
+            e.stopPropagation(); // Prevent flipping card when clicking button
+            cards[currentIndex].understood = !cards[currentIndex].understood;
+            updateUI();
+        }
+
+        // Shuffle logic (Fisher-Yates)
+        function shuffleCards() {
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            currentIndex = 0;
+            renderNavGrid(); // Re-render grid because order changed
+            updateUI();
+        }
+
+        // Progress Tracking
+        function updateProgress() {
+            const understoodCount = cards.filter(c => c.understood).length;
+            const percentage = (understoodCount / totalCards) * 100;
+            
+            progressBar.style.width = `${percentage}%`;
+            progressText.innerText = `${understoodCount} / ${totalCards} Dipahami`;
+        }
+
+        // Navigation Grid
+        function renderNavGrid() {
+            navGrid.innerHTML = '';
+            cards.forEach((card, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('nav-dot');
+                dot.innerText = index + 1;
+                dot.onclick = () => goToCard(index);
+                // Attach reference ID to help update highlights easily
+                dot.dataset.index = index;
+                navGrid.appendChild(dot);
+            });
+        }
+
+        function updateNavGridHighlight() {
+            const dots = document.querySelectorAll('.nav-dot');
+            dots.forEach((dot, index) => {
+                // Reset classes
+                dot.classList.remove('active', 'understood');
+                
+                // Add classes based on state
+                if (index === currentIndex) dot.classList.add('active');
+                if (cards[index].understood) dot.classList.add('understood');
+            });
+        }
+
+        // Start app
+        init();
+
+        // Keyboard navigation support
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextCard();
+            else if (e.key === 'ArrowLeft') prevCard();
+            else if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                flipCard();
+            }
+        });
+    </script>
+</body>
+</html>
